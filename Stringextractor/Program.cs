@@ -14,16 +14,22 @@ namespace Stringextractor
             bigtimer.Start();
             string root = Path.GetFullPath(@".\");
             List<string> filelist = Directory.GetFileSystemEntries(root, "*", SearchOption.TopDirectoryOnly).ToList();
+            int counter = 0;
             for(int count = 0; count < filelist.Count -1; count ++)
             {
-
+                FileAttributes atr = File.GetAttributes(filelist[count]);
+                if (atr.HasFlag(FileAttributes.Directory) == false)
+                {
+                    counter++;
+                    FormatHex(ReturnHex(filelist[count]), filelist[count]);
+                }
             }
 
 
 
             bigtimer.Stop();
             TimeSpan rundurationraw = bigtimer.Elapsed;
-
+            Console.WriteLine("Files processed: " + counter);
             Console.WriteLine("Runtime " + rundurationraw);
             Console.WriteLine("Press any key to exit");
             Console.ReadLine();
