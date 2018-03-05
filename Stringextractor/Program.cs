@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Stringextractor
 {
@@ -15,13 +16,18 @@ namespace Stringextractor
             string root = Path.GetFullPath(@".\");
             List<string> filelist = Directory.GetFileSystemEntries(root, "*", SearchOption.TopDirectoryOnly).ToList();
             int counter = 0;
-            for(int count = 0; count < filelist.Count -1; count ++)
+            string MyName = (Process.GetCurrentProcess()).MainModule.FileName;
+            Console.WriteLine(MyName);
+            for (int count = 0; count < filelist.Count -1; count ++)
             {
-                FileAttributes atr = File.GetAttributes(filelist[count]);
-                if (atr.HasFlag(FileAttributes.Directory) == false)
+                if (Path.GetFileName(filelist[count]) != MyName)
                 {
-                    counter++;
-                    FormatHex(ReturnHex(filelist[count]), filelist[count]);
+                    FileAttributes atr = File.GetAttributes(filelist[count]);
+                    if (atr.HasFlag(FileAttributes.Directory) == false)
+                    {
+                        counter++;
+                        FormatHex(ReturnHex(filelist[count]), filelist[count]);
+                    }
                 }
             }
 
@@ -48,7 +54,15 @@ namespace Stringextractor
         {
             byte[] bytes = File.ReadAllBytes(filepath);
             string hex = BitConverter.ToString(bytes);
-            return hex.Replace("_", "");
+            hex = hex.Replace("-", "");
+            hex = "Hex Code: \r\n" + hex;
+            hex += "\r\n\r\n ASCII: \r\n";
+            hex += Encoding.ASCII.GetString(bytes);
+            hex += "\r\n\r\n Unicode: \r\n";
+            hex += Encoding.Unicode.GetString(bytes);
+            hex += "\r\n\r\n UTF8: \r\n";
+            hex += Encoding.UTF8.GetString(bytes);
+            return hex;
         }
     }
 }
